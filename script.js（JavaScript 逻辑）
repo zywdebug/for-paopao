@@ -1,0 +1,86 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    const togglePasswordBtn = document.getElementById('toggle-password');
+    const unlockBtn = document.getElementById('unlock-btn');
+    const messageDiv = document.getElementById('message');
+    
+    // 切换密码可见性
+    togglePasswordBtn.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        // 切换图标
+        const icon = this.querySelector('i');
+        icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+    });
+    
+    // 解锁按钮点击事件
+    unlockBtn.addEventListener('click', function() {
+        const enteredPassword = passwordInput.value.trim();
+        const correctPassword = 'miao'; // 设置你的密码
+        
+        // 清空之前的消息
+        messageDiv.className = 'message';
+        messageDiv.textContent = '';
+        
+        if (!enteredPassword) {
+            showMessage('请输入密码哦~', 'error');
+            return;
+        }
+        
+        if (enteredPassword === correctPassword) {
+            showMessage('密码正确！正在为你打开信件...', 'success');
+            
+            // 添加一些解锁动画效果
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 解锁中...';
+            this.disabled = true;
+            
+            // 延迟跳转，让用户看到成功消息
+            setTimeout(() => {
+                window.location.href = 'secret-page.html';
+            }, 1500);
+        } else {
+            showMessage('密码错误，请再试试看~', 'error');
+            passwordInput.value = '';
+            passwordInput.focus();
+            
+            // 添加抖动效果
+            passwordInput.parentElement.style.animation = 'shake 0.5s';
+            setTimeout(() => {
+                passwordInput.parentElement.style.animation = '';
+            }, 500);
+        }
+    });
+    
+    // 按Enter键也可以解锁
+    passwordInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            unlockBtn.click();
+        }
+    });
+    
+    // 显示消息的函数
+    function showMessage(text, type) {
+        messageDiv.textContent = text;
+        messageDiv.className = `message ${type}`;
+        
+        // 3秒后自动隐藏错误消息（成功消息会在跳转前消失）
+        if (type === 'error') {
+            setTimeout(() => {
+                messageDiv.className = 'message';
+                messageDiv.textContent = '';
+            }, 3000);
+        }
+    }
+    
+    // 添加抖动动画到CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+    `;
+    document.head.appendChild(style);
+});
